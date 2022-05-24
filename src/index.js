@@ -15,8 +15,6 @@ let config = {
             debug: false
         }
     }
-
-
 };
 let knight;
 let crates;
@@ -35,29 +33,49 @@ let coinGenerationInterval = 2000; //
 let playerSpeed = 150; //
 let gameSecond = 1000; //
 let valuation = 1;  //
-
+let contracts;
 
 let gameOver = false;
 
 const KNIGHT_SCALING = 0.1;
 
-function loadGame() {
-    address = document.getElementById("ethAddress").value;
+function addressChanged() {
+    if (address == null || address == "" || address.length != 42 || address[0] != "0" || address[1] != "x") {
+        document.getElementById("eth-address").innerHTML += "Wrong wallet address";
+        document.getElementById("btn-login-meta").disabled = true;
+    }
+    else {
+        address = document.getElementById("eth-address").value;
+        document.getElementById("btn-login-meta").disabled = false;
+    }
+}
+
+async function loadGame() {
     if (address != "<empty string>" &&
         game == null) {
-        getUserItems()
-            .then(game = new Phaser.Game(config));
+        address = document.getElementById("eth-address").value;
+        if (address == null || address == "" || address.length != 42 || address[0] != "0" || address[1] != "x") {
+            document.getElementById("eth-address").value = null;
+            document.getElementById("eth-address").placeholder = "Wrong wallet address!";
+        }
+        else {
+            contracts = await init();
+            getUserItems(contracts)
+                .then(game = new Phaser.Game(config));
+        }
     }
 }
 
 function updateTimeLeft() {
     if (gameOver == true) {
         if (!coinsSet) {
-            if (address == null || address == "") {
-                document.getElementById("game-info").innerHTML += "<br>Wrong wallet address</br>";
+
+            if (score == 0) {
+                document.getElementById("game-info").innerHTML += "<br>Score is zero so transfer will not happen</br>";
+                coinsSet = true; // temporary
             }
             else {
-                mintAfterGame(address, (score)); //* (10 ** 18)
+                mintAfterGame(address, score, contracts); //* (10 ** 18)
                 coinsSet = true;
             }
         }
@@ -98,7 +116,6 @@ function collectCoin(knight, coin) {
 }
 
 function gamePreload() {
-    //contract = init()
     //loading assets
     console.log("The game is loading assets");
     this.load.image("knight", "assets/knight.png")
@@ -138,18 +155,17 @@ function gameCreate() {
     knight.scaleX = KNIGHT_SCALING;
     knight.scaleY = KNIGHT_SCALING;
 
+    // platform 1
     // create the crates
     crates = this.physics.add.staticGroup();
 
     // floor
     createFloor(80, 240, 80);
     createFloor(620, 160, 80);
-
     //walls
     createWall(400, 80, 800);
     createWall(400, 80, -10);
-
-    // platform 1
+    //random
     crates.create(410, 265, "crate");
     crates.create(470, 175, "crate");
     crates.create(320, 290, "crate");

@@ -1,14 +1,14 @@
 ## Knight Game:
 
-Prerequisits to play:
+#### Prerequisits to play:
 - Metamask with Ropsten address and ropsten ETH
 
-Ropsten addresses:
-    - Marketplace:
-    - Game Token (ERC20):
-    - Knight Token (ERC1155):
+#### Ropsten addresses:
+- Marketplace:
+- Game Token (ERC20):
+- Knight Token (ERC1155):
 
-Features:
+#### Features:
 - [x] gathering Game tokens (ERC20) with your wallet 
 - [x] buying nfts (ERC1155) which improves abilities in the game
 - [x] getting information about transactions
@@ -23,3 +23,4 @@ Features:
     - requirements will be related with Game Token 
     - after reload the level will depend on number of Game Tokens
 - [ ] safety and vulnerabilities:
+    - tests

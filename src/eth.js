@@ -23,13 +23,13 @@ async function init() {
     let GameToken = new web3.eth.Contract(tokenAbi, "0xFc73f603D0a7Bf21Aa6EF466c1cB1617ebdea904");
     let KnightToken = new web3.eth.Contract(knightTokenAbi, "0xECad914c8a43D23F2AC7A5462dE989Abe53faf10");
     let Marketplace = new web3.eth.Contract(marketplaceAbi, "0x373537a71Ae2B36B5c09a7912B56706A1afb239B");
-    console.log(GameToken);
+    //console.log(GameToken);
     return [GameToken, KnightToken, Marketplace];
 }
 
 
-async function mintAfterGame(address, nrOfTokens) {
-    [GameToken, KnightToken, Marketplace] = await init();
+async function mintAfterGame(address, nrOfTokens, contracts) {
+    [GameToken, KnightToken, Marketplace] = contracts;
     GameToken.methods.mint(address, nrOfTokens).send({ from: address })
         .on('receipt', receipt => {
             document.getElementById("game-info").innerHTML += "<br>Transaction Complete</br>";
@@ -37,7 +37,7 @@ async function mintAfterGame(address, nrOfTokens) {
 }
 
 async function buyToken(id) {
-    [GameToken, KnightToken, Marketplace] = await init();
+    [GameToken, KnightToken, Marketplace] = contracts;
 
     web3.eth.getAccounts().then(accountArray => {
         let account = accountArray[0];
@@ -64,8 +64,8 @@ async function buyToken(id) {
     })
 }
 
-async function getUserItems() {
-    [GameToken, KnightToken, Marketplace] = await init();
+async function getUserItems(contracts) {
+    [GameToken, KnightToken, Marketplace] = contracts;
     let tokenPromises;
     tokenPromises = []
     web3.eth.getAccounts().then(accountArray => {
