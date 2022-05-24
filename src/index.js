@@ -2,6 +2,7 @@ let config = {
     width: 800,
     height: 400,
     type: Phaser.AUTO,
+    parent: "game-window",
     scene: {
         preload: gamePreload,
         create: gameCreate,
@@ -20,27 +21,43 @@ let config = {
 let knight;
 let crates;
 let cursors;
-let game = new Phaser.Game(config);
 let score = 0;
 let scoreText;
 let timeleftText;
 let timeleftTimer;
+let coinTimer;
 let secondsLeft = 10;
 let coinsSet = false;
+let game = null;
+let address = null;
+//NFT parameters
+let coinGenerationInterval = 2000; //
+let playerSpeed = 150; //
+let gameSecond = 1000; //
+let valuation = 1;  //
+
 
 let gameOver = false;
 
 const KNIGHT_SCALING = 0.1;
 
+function loadGame() {
+    address = document.getElementById("ethAddress").value;
+    if (address != "<empty string>" &&
+        game == null) {
+        getUserItems()
+            .then(game = new Phaser.Game(config));
+    }
+}
+
 function updateTimeLeft() {
     if (gameOver == true) {
         if (!coinsSet) {
-            let address = prompt("Please enter your ETH address");
             if (address == null || address == "") {
-                alert("User cancellede the prompt");
+                document.getElementById("game-info").innerHTML += "<br>Wrong wallet address</br>";
             }
             else {
-                mintAfterGame(address, score);
+                mintAfterGame(address, (score)); //* (10 ** 18)
                 coinsSet = true;
             }
         }
@@ -76,11 +93,12 @@ function generateCoins() {
 
 function collectCoin(knight, coin) {
     coin.disableBody(true, true);
-    score++;
+    score += valuation;
     scoreText.setText("Bitcoin bag:" + score);
 }
 
 function gamePreload() {
+    //contract = init()
     //loading assets
     console.log("The game is loading assets");
     this.load.image("knight", "assets/knight.png")
@@ -93,6 +111,18 @@ function gamePreload() {
     }
     for (let i = 1; i <= 10; i++) {
         this.load.image("idle_frame_" + i.toString(), "assets/knight/idle/Idle (" + i.toString() + ").png")
+    }
+}
+
+function createFloor(start, length, spaceBetween) {
+    for (let x = start; x < (start + length); x += spaceBetween) {
+        crates.create(x, 365, "crate");
+    }
+}
+
+function createWall(length, spaceBetween, x) {
+    for (let y = 365; y > (365 - length); y -= spaceBetween) {
+        crates.create(x, y, "crate");
     }
 }
 
@@ -112,18 +142,20 @@ function gameCreate() {
     crates = this.physics.add.staticGroup();
 
     // floor
-    crates.create(40, 365, "crate");
-    crates.create(120, 365, "crate");
-    crates.create(200, 365, "crate");
-    crates.create(280, 365, "crate");
-    crates.create(360, 365, "crate");
-    crates.create(440, 365, "crate");
-    crates.create(520, 365, "crate");
+    createFloor(80, 240, 80);
+    createFloor(620, 160, 80);
+
+    //walls
+    createWall(400, 80, 800);
+    createWall(400, 80, -10);
 
     // platform 1
-    crates.create(450, 265, "crate");
-    crates.create(490, 165, "crate");
-    crates.create(320, 280, "crate");
+    crates.create(410, 265, "crate");
+    crates.create(470, 175, "crate");
+    crates.create(320, 290, "crate");
+    crates.create(120, 100, "crate");
+    crates.create(260, 85, "crate");
+    crates.create(700, 70, "crate");
 
     this.anims.create({
         key: "knight_run",
@@ -176,15 +208,15 @@ function gameCreate() {
 
     });
 
-    let coinTimer = this.time.addEvent({
-        delay: Phaser.Math.Between(700, 1300),
+    coinTimer = this.time.addEvent({
+        delay: coinGenerationInterval,
         callback: generateCoins,
         callbackScope: this,
         repeat: -1
     });
 
     timeleftTimer = this.time.addEvent({
-        delay: 1000,
+        delay: gameSecond,
         callback: updateTimeLeft,
         callbackScope: this,
         repeat: -1
@@ -196,12 +228,12 @@ function gameUpdate() {
     //monitoring inputs and telling game how to update
     //console.log("Game is updating");
     if (cursors.left.isDown) {
-        knight.setVelocityX(-160);
+        knight.setVelocityX(-playerSpeed);
         knight.play("knight_run", true); // tru argument is to finish the animation
         knight.flipX = true;
     }
     else if (cursors.right.isDown) {
-        knight.setVelocityX(160);
+        knight.setVelocityX(playerSpeed);
         knight.play("knight_run", true);
         knight.flipX = false;
     }
@@ -210,7 +242,7 @@ function gameUpdate() {
         knight.play("knight_idle", true);
     }
     if (cursors.up.isDown && knight.body.touching.down) {
-        knight.setVelocityY(-400);
+        knight.setVelocityY(-(Math.sqrt(800 * playerSpeed)));
     }
 
 }

@@ -7,14 +7,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"></script>
+    <script src="./src/abi.js"></script>
     <script src="./src/eth.js"></script>
     <script src="./src/index.js"></script>
+    <link href="./bootstrap_css/bootstrap.min.css" rel="stylesheet">
+    <link href="./page-css/page.css" rel="stylesheet">
     <title>Knight game</title>
 </head>
 
 <body>
-    <h1>Game</h1>
-    <h2>Second heading</h2>
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <label class="navbar-brand col-md-2 col-lg-4 me-0 px-1">Paste address and start the game: </label>
+        <input id="ethAddress" class="form-control form-control-dark w-70" type="text" placeholder="ETH address"
+            aria-label="ETH address">
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <button onclick="buyToken(0)" class='btn btn-primary m-sm-2'>Buy pumped boots: 0.001
+                                ETH</button>
+                        </li>
+                        <li class="nav-item">
+                            <button onclick="buyToken(1)" class='btn btn-primary m-sm-2'>Buy sky blessing helmet:
+                                0.0015
+                                ETH</button>
+                        </li>
+                        <li class="nav-item">
+                            <button onclick="buyToken(2)" class='btn btn-primary m-sm-2'>Buy bull market suit: 0.002
+                                ETH</button>
+                        </li>
+                        <li class="nav-item">
+                            <button onclick="buyToken(3)" class='btn btn-primary m-sm-2'>Buy freezing gloves: 0.003
+                                ETH</button>
+                        </li>
+
+                    </ul>
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Legend:</span>
+                        <a class="link-secondary" href="#" aria-label="Add a new report">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    <ul class="nav flex-column mb-1">
+                        <li class="nav-item"> <label class="nav-link"> Pumped boots - increase speed of hero </label>
+                        </li>
+                        <li class="nav-item"><label class="nav-link"> Sky blessing - inrease frequency of dropping
+                                coins</label>
+                        </li>
+                        <li class="nav-item"><label class="nav-link"> Bull market suit - inrease value of the dropping
+                                coins</label></li>
+                        <li class="nav-item"><label class="nav-link"> Freezing gloves - slows down the timer</label>
+                        </li>
+
+
+                    </ul>
+                </div>
+            </nav>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="navbar-nav">
+                    <div class="nav-item text-nowrap">
+                        <button onclick="loadGame()" id="btn-login-meta"
+                            class="w-100 btn btn-lg btn-primary margin">Start
+                            the game!</button>
+                    </div>
+                </div>
+                <div id="game-window"
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+                </div>
+                <label for="">Game info:</label>
+                <label id="game-info" type="test" for=""></label>
+            </main>
+        </div>
+    </div>
 </body>
+<footer>
+
+</footer>
 
 </html>
